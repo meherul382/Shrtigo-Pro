@@ -25,6 +25,8 @@ function detectOs(ua: string) {
 
 export async function GET(request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params
+  if (!supabaseAdmin) return new NextResponse('Shrtigo Pro is not configured yet.', { status: 503 })
+
   const { data: link, error } = await supabaseAdmin.from('links').select('id,target_url,expires_at,is_active').eq('slug', slug).maybeSingle()
   if (error || !link || !link.is_active || (link.expires_at && new Date(link.expires_at) <= new Date())) return new NextResponse('Short link not found or expired.', { status: 404 })
 
